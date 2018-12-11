@@ -22,3 +22,4 @@ my next goals are:
 2. Reduce duplicates downloads by getting the songs that are already existing before launching youtube-dl
 3. Sort songs by Artists
 4. Manage naming convention of songs
+5. List latest Youtube playlists 
