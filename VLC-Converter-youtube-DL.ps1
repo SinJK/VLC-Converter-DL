@@ -1,4 +1,24 @@
-﻿ $outputExtension = ".mp3"
+<#
+.SYNOPSIS
+  This script simply download youtube with youtube-dl song or playlist and convert it into .mp3 with VLC converter.
+.DESCRIPTION
+  
+.PARAMETER <Parameter_Name>
+    None
+.INPUTS
+ You will be asked to enter the destination path and youtube URL.
+.OUTPUTS
+  None
+.NOTES
+  Version:        1.0
+  Author:         SinJK
+  Creation Date:  07/11/2018
+  Purpose/Change: Script mp3 converter
+  
+.EXAMPLE
+  None
+#>
+ $outputExtension = ".mp3"
    $bitrate = 128
    $channels = 2
    $samplerate= 48000
@@ -145,7 +165,5 @@ Get-Job | Remove-Job
 
    start-sleep 2
 
-
-   Get-Location -
 
 
