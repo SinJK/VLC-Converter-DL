@@ -23,3 +23,4 @@ my next goals are:
 3. Sort songs by Artists
 4. Manage naming convention of songs
 5. List latest Youtube playlists 
+6. Add navigation Menu
