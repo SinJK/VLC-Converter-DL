@@ -24,3 +24,4 @@ my next goals are:
 4. Manage naming convention of songs
 5. List latest Youtube playlists 
 6. Add navigation Menu
+7. Add FLAC extension
