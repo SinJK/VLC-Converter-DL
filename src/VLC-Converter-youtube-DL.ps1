@@ -38,7 +38,7 @@ $b = gci $pathHash\* -file -recurse | Group-Object Length | Where-Object { $_.Co
 
 Write-Host "Looking for duplicates by HASH" -ForegroundColor Yellow
 
-# | select -ExpandProperty path | foreach {Remove-Item -LiteralPath $_ } | Out-String bite
+# | select -ExpandProperty path | foreach {Remove-Item -LiteralPath $_ } | Out-String
 foreach($p in $b){
 Write-Host "Deleting" $p.Path -ForegroundColor Cyan
 Start-Sleep 1
@@ -89,7 +89,7 @@ Else {
    { 
      $inputFile2 = $inputFile.FullName.Replace("[","").Replace("]","")
      $outputFileName = [System.IO.Path]::GetFileNameWithoutExtension($inputFile.FullName) + $outputExtension;
-     $outputFileName = [System.IO.Path]::Combine("D:\musique", $outputFileName);
+     $outputFileName = [System.IO.Path]::Combine($path, $outputFileName);
      
      
      #$inputFile -replace ' ','%20'
