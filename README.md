@@ -12,6 +12,7 @@ This script download youtube using [youtube-dl](https://github.com/rg3/youtube-d
 ## Requirements
 You will need [youtube-dl](https://github.com/rg3/youtube-dl) and VLC to get it work.
 Please be sure that VLC is stored in the C:\programfiles folder.
+
 Be sure to add the path of youtube-dl.exe at the line beginning with "&"
 ## What's next ?
 **_First_**
