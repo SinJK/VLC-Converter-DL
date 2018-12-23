@@ -1,0 +1,189 @@
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$path = "D:\Music\tits"
+$staticpath = "D:\Music\tits"
+$basedURL = 'https://api.discogs.com/database/' 
+$p2=gci -Path $path -Filter *.mp3
+
+$vanillasong = gci -Path $path -Filter *.mp3 | select FullName
+$song1 = $p2.BaseName
+
+foreach($song in $song1){
+$stat=$song
+if($song -match "()"){
+$song = $song -replace '\(([^\)]+)\)', ''
+
+}
+
+if($song -match "'"){
+$song = $song -replace "'", ''
+
+}
+if($song -match "official"){
+$song =$song -replace 'official',""
+
+}
+
+
+if($song -match "music"){
+$song = $song -replace "music",""
+
+}
+if($song -match "lyrics"){
+$song = $song -replace "lyrics",""
+
+}
+
+if($song -match "video"){
+$song = $song -replace "video",""
+
+}
+
+if($song -match "feat"){
+$song = $song -replace "feat",""
+
+}
+
+if($song -match "copie"){
+$song = $song -replace "copie",""
+
+}
+
+$song = $song -replace '\[([^\)]+)\]', ''
+
+if($song -match "ft"){
+
+$song = $song.Substring(0, $song.IndexOf('ft'))
+}
+
+
+ 
+
+}
+
+
+$title = $song.Split("-")[1]
+$artist = $song.Split("-")[0]
+Write-Host $title -ForegroundColor Cyan
+$title = $title.Trim()
+$headers = "ytconverterdl/1.0" 
+                                              
+$uri = $basedURL + "search?q=$title - $artist&per_page=5&type=all&token=wBeCqNzkqcSCQPIBJcdJTlIDElrKcPlQtXFDgjWQ"
+$uri = $uri -replace ' ','+'
+#search?q=YoungBoy Never Broke Again – Overdose&token=wBeCqNzkqcSCQPIBJcdJTlIDElrKcPlQtXFDgjWQ"
+#$json = $body | ConvertTo-Json;
+                                                              
+#$y=Invoke-RestMethod -Uri https://api.discogs.com/releases/12155728
+write-host "avant"  
+$y= Invoke-RestMethod -Uri $uri -UserAgent $headers -method Get
+write-host "apres"
+$x=$y.results
+
+$w=$x -match $artist.Trim()
+$pi= $w.master_url | select -First 1
+Invoke-RestMethod -Uri $pi
+$pizza=Invoke-RestMethod -Uri $w.resource_url -UserAgent $headers
+$pizza2 = Invoke-RestMethod -Uri $pizza.releases_url -UserAgent $headers
+$m=$pizza2.releases
+$c = $m -match $title.Trim()
+if($c){
+$c.artist
+$c.year
+$c.title
+}
+
+foreach($release in $x){
+$ru=Invoke-RestMethod -Uri $release.resource_url -UserAgent $headers
+$p=$ru.tracklist
+#$p.title
+#$ru.artists_sort
+if($p.title | where {$_ -match $title.Trim()}){
+$t = $p.title | where {$_ -match $title.Trim()}
+#write-host $t
+Start-Sleep 3
+continue
+}
+}
+
+$t
+$artist_tag=$ru.artists.name -replace '\(([^\)]+)\)', ''
+$artist_tag
+$ru.title
+$tracklist=$ru.tracklist -match $t
+$tracklist=$tracklist.position
+$tracklist=($tracklist.toCharArray()|%{if($_ -Match '\d'){$_}}) -Join ""
+$ru.year
+#$resource=$x.resource_url | select -First 1
+#$ru=Invoke-RestMethod $resource
+
+
+#$titre = $p.title
+#$split = $text.split("-")
+
+#$titre= $split[1]
+#$ru.tracklist | select title | where {$_ -match $titre.Trim()}
+
+
+
+#$ru.artists_sort
+#$ru.title
+
+<#
+      [string]$path= "$staticpath\$stat.mp3"
+      [string]$Title = $t
+      [string]$Artist  = $artist_tag
+      [string]$Album = $ru.title
+      [string]$Year = $ru.year
+   
+      [int]$Track = $tracklist
+      [int]$Genre = "" 
+      [bool]$BackDate=$true
+       
+        Try{
+            $enc = [System.Text.Encoding]::ASCII 
+            $currentID3Bytes = New-Object byte[] (128)
+            $strm = New-Object System.IO.FileStream ($path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::ReadWrite,[System.IO.FileShare]::None)
+            $strm.Seek(-128,'End') | Out-Null
+            $strm.Read($currentID3Bytes,0,$currentID3Bytes.Length) | Out-Null
+            Write-Host "$path `nCurrentID3: $($enc.GetString($currentID3Bytes))"
+            $strm.Seek(-128,'End') | Out-Null
+            If($enc.GetString($currentID3Bytes[0..2]) -ne  'TAG'){
+                Write-Warning "No existing ID3v1 found - adding to end of file"
+                $strm.Seek(0,'End') 
+                $currentID3Bytes = $enc.GetBytes(('TAG' + (' ' * (30 + 30 + 30 + 4 + 30)))) 
+                $currentID3Bytes += 255 
+                $strm.Write($currentID3Bytes,0,$currentID3Bytes.length)
+                $strm.Flush()
+                $Strm.Close()
+                $strm = New-Object System.IO.FileStream ($path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::Write,[System.IO.FileShare]::None)
+                $strm.Seek(-128,'End') 
+            } 
+           $strm.Seek(3,'Current')  #skip over 'TAG' to get to the good stuff
+           #Skip over
+           $strm.Write($enc.GetBytes($Title.PadRight(30,' ').Substring(0,30)),0,30)
+           $strm.Write($enc.GetBytes($Artist.PadRight(30,' ').Substring(0,30)),0,30)
+           $strm.Write($enc.GetBytes($Album.PadRight(30,' ').Substring(0,30)),0,30)
+           $strm.Write($enc.GetBytes($Year.PadRight(4,' ').Substring(0,4)),0,4)
+           
+            $currentID3Bytes[125] -eq 0
+            $CommentMaxLen = 28 #If a Track is specified or present in the file, Comment is 28 chars
+            $Comment -eq "`0" 
+            $strm.Seek($CommentMaxLen,'Current') | Out-Null 
+             
+            $strm.Write(@(0,$Track),0,2)
+           # $strm.Write($Genre,0,1) | Out-Null
+       
+          
+        }Catch{
+            Write-Error $_.Exception.Message
+        }Finally{
+            If($strm){
+                $strm.Flush()
+                $strm.Close()
+            }
+        }
+   
+  
+  }
+
+
+  #>
