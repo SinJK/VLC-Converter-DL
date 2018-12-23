@@ -67,7 +67,7 @@ Write-Host $title -ForegroundColor Cyan
 $title = $title.Trim()
 $headers = "ytconverterdl/1.0" 
                                               
-$uri = $basedURL + "search?q=$title - $artist&per_page=5&type=all&token=wBeCqNzkqcSCQPIBJcdJTlIDElrKcPlQtXFDgjWQ"
+$uri = $basedURL + "search?q=$title - $artist&per_page=5&type=all&token=***"
 $uri = $uri -replace ' ','+'
 #search?q=YoungBoy Never Broke Again – Overdose&token=wBeCqNzkqcSCQPIBJcdJTlIDElrKcPlQtXFDgjWQ"
 #$json = $body | ConvertTo-Json;
