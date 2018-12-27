@@ -1,3 +1,4 @@
+function DiscogsAPI($path){
 <#
 .SYNOPSIS
   This script try to get .mp3 metadatas from Discogs.
@@ -233,4 +234,6 @@ $p2=gci -Path $path -Filter *.mp3
 $vanillasong = gci -Path $path -Filter *.mp3 | select FullName
 $song1 = $p2.BaseName
 #################################################################################
+}
+
 }
