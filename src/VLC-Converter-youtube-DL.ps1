@@ -38,7 +38,6 @@ $b = gci $pathHash\* -file -recurse | Group-Object Length | Where-Object { $_.Co
 
 Write-Host "Looking for duplicates by HASH" -ForegroundColor Yellow
 
-# | select -ExpandProperty path | foreach {Remove-Item -LiteralPath $_ } | Out-String
 foreach($p in $b){
 Write-Host "Deleting" $p.Path -ForegroundColor Cyan
 Start-Sleep 1
@@ -103,7 +102,6 @@ Else {
      Start-Job $job -ArgumentList $path,$inputFile.Name
      
 Get-Job | Wait-Job 
-#Get-Job
 Get-Job | Remove-Job
 
         if(Test-Path $path\$inputFile){
