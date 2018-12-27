@@ -1,12 +1,35 @@
+<#
+.SYNOPSIS
+  This script try to get .mp3 metadatas from Discogs.
+.DESCRIPTION
+  
+.PARAMETER <Parameter_Name>
+    None
+.INPUTS
+ Just input the path of the directory that contains mp3 you want to update.
+.OUTPUTS
+  None
+.NOTES
+  Version:        1.0
+  Author:         SinJK
+  Creation Date:  07/11/2018
+  Purpose/Change: Script mp3 converter
+  
+.EXAMPLE
+  None
+#>
+#############################Settings############################################
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$path = "D:\Music\tits"
-$staticpath = "D:\Music\tits"
+$path = "path"
+$staticpath = "path"
 $basedURL = 'https://api.discogs.com/database/' 
 $p2=gci -Path $path -Filter *.mp3
-
 $vanillasong = gci -Path $path -Filter *.mp3 | select FullName
 $song1 = $p2.BaseName
+#################################################################################
+###########################Loop through each song################################
 
+###########################First loop to clean up songs name#####################
 foreach($song in $song1){
 $stat=$song
 if($song -match "()"){
@@ -15,7 +38,7 @@ $song = $song -replace '\(([^\)]+)\)', ''
 }
 
 if($song -match "'"){
-$song = $song -replace "'", ''
+$song = $song -replace "( ' )", ' - '
 
 }
 if($song -match "official"){
@@ -39,10 +62,22 @@ $song = $song -replace "video",""
 }
 
 if($song -match "feat"){
-$song = $song -replace "feat",""
+$song = $song -replace '(feat).*?(?=-)', ''
+$song = $song -replace '(feat.).*', ''
 
 }
+if($song -match "explicit"){
+$song = $song -replace "explicit",""
 
+}
+if($song -match "officialvideo"){
+$song = $song -replace "official video",""
+
+}
+if($song -match "clip officiel"){
+$song = $song -replace "clip officiel",""
+
+}
 if($song -match "copie"){
 $song = $song -replace "copie",""
 
@@ -52,96 +87,98 @@ $song = $song -replace '\[([^\)]+)\]', ''
 
 if($song -match "ft"){
 
-$song = $song.Substring(0, $song.IndexOf('ft'))
-}
-
-
- 
+#$song = $song -replace '(ft).*?(?=-)', ''
+$song = $song -replace '(ft).*?(?= - )', ''
+$song = $song -replace '(ft.).*', ''
 
 }
 
+
+#$song = $song -replace "(')", '-'
+$oldtitle = $song.Split("-")[1]
 
 $title = $song.Split("-")[1]
+$title = $title -replace "’", "'"
+$title = $title -replace "_", ""
 $artist = $song.Split("-")[0]
-Write-Host $title -ForegroundColor Cyan
+Write-Host $artist - $title -ForegroundColor Cyan
 $title = $title.Trim()
-$headers = "ytconverterdl/1.0" 
-                                              
-$uri = $basedURL + "search?q=$title - $artist&per_page=5&type=all&token=***"
+#################################################################################
+
+################################API SETTINGS#####################################
+$headers = "ytconverterdl/1.0 +https://github.com/SinJK/VLC-Converter-youtube-DL" 
+                                           
+$uri = $basedURL + "search?q=$title - $artist&per_page=5&type=all&token=*******"
 $uri = $uri -replace ' ','+'
-#search?q=YoungBoy Never Broke Again – Overdose&token=wBeCqNzkqcSCQPIBJcdJTlIDElrKcPlQtXFDgjWQ"
-#$json = $body | ConvertTo-Json;
-                                                              
-#$y=Invoke-RestMethod -Uri https://api.discogs.com/releases/12155728
+Write-host [$uri]
+
 write-host "avant"  
+
+###############################API CALL##########################################
 $y= Invoke-RestMethod -Uri $uri -UserAgent $headers -method Get
+
 write-host "apres"
-$x=$y.results
+$results=$y.results
 
-$w=$x -match $artist.Trim()
-$pi= $w.master_url | select -First 1
-Invoke-RestMethod -Uri $pi
-$pizza=Invoke-RestMethod -Uri $w.resource_url -UserAgent $headers
-$pizza2 = Invoke-RestMethod -Uri $pizza.releases_url -UserAgent $headers
-$m=$pizza2.releases
-$c = $m -match $title.Trim()
-if($c){
-$c.artist
-$c.year
-$c.title
+$w=$results -match $artist.Trim()
+
+$album = $results | Where-Object {$_.format -match "Album"} | select -First 5
+#################################################################################
+
+########################Loop to get song's infos#################################
+#$ivalbum=$album.master_url
+foreach($release in $album){
+#if($release){
+
+$release.resource_url
+$release.master_url
+
+$ivalbum=Invoke-RestMethod -Uri $release.resource_url -UserAgent $headers -method Get
+
+if($ivalbum.artists.name -replace '\(([^\)]+)\)', '' -notmatch $artist.Trim()){break}
+if($tracklist = $ivalbum.tracklist | where {$_ -match $title.Trim()}){
+$tracklistpos = $tracklist.position|select -First 1
+#$tracklistpos = ($tracklist.toCharArray()|%{if($_ -Match '\w'){$_}}) -Join "" | Out-Null
+$tracklistpos = $tracklist.position -replace "\D",""
+$track=$tracklist.title |select -First 1
+$ivalbum.title
+$tracklistpos
+$year = $ivalbum.year
+$year
+$artist = $ivalbum.artists.name -replace '\(([^\)]+)\)', ''
+$artist
+break
 }
+#################################################################################
 
-foreach($release in $x){
-$ru=Invoke-RestMethod -Uri $release.resource_url -UserAgent $headers
-$p=$ru.tracklist
-#$p.title
-#$ru.artists_sort
-if($p.title | where {$_ -match $title.Trim()}){
-$t = $p.title | where {$_ -match $title.Trim()}
-#write-host $t
 Start-Sleep 3
-continue
+#}
 }
-}
 
-$t
-$artist_tag=$ru.artists.name -replace '\(([^\)]+)\)', ''
-$artist_tag
-$ru.title
-$tracklist=$ru.tracklist -match $t
-$tracklist=$tracklist.position
-$tracklist=($tracklist.toCharArray()|%{if($_ -Match '\d'){$_}}) -Join ""
-$ru.year
-#$resource=$x.resource_url | select -First 1
-#$ru=Invoke-RestMethod $resource
+##############################In case the title is not found#####################
+#get the Name cleaned at the beginning
+if($track -eq $null){$track = $title}
+$newSongName = "$artist - $title"
+Rename-Item -LiteralPath "$staticpath$stat.mp3" -NewName "$newSongName.mp3"
+#################################################################################
 
 
-#$titre = $p.title
-#$split = $text.split("-")
-
-#$titre= $split[1]
-#$ru.tracklist | select title | where {$_ -match $titre.Trim()}
-
-
-
-#$ru.artists_sort
-#$ru.title
-
-<#
-      [string]$path= "$staticpath\$stat.mp3"
-      [string]$Title = $t
-      [string]$Artist  = $artist_tag
-      [string]$Album = $ru.title
-      [string]$Year = $ru.year
+############################Metadata add to the song file########################
+      [string]$id3path= "$staticpath$newSongName.mp3"
+      #\$stat.mp3
+      [string]$Title = $track
+      [string]$Artist  = $artist
+      [string]$Album = $ivalbum.title
+      [string]$Year = $year
    
-      [int]$Track = $tracklist
+      [int]$Track = $tracklistpos
       [int]$Genre = "" 
       [bool]$BackDate=$true
        
         Try{
-            $enc = [System.Text.Encoding]::ASCII 
+            $enc = [System.Text.Encoding]::Default
             $currentID3Bytes = New-Object byte[] (128)
-            $strm = New-Object System.IO.FileStream ($path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::ReadWrite,[System.IO.FileShare]::None)
+            $strm = New-Object System.IO.FileStream ($id3path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::ReadWrite,[System.IO.FileShare]::None)
             $strm.Seek(-128,'End') | Out-Null
             $strm.Read($currentID3Bytes,0,$currentID3Bytes.Length) | Out-Null
             Write-Host "$path `nCurrentID3: $($enc.GetString($currentID3Bytes))"
@@ -154,7 +191,7 @@ $ru.year
                 $strm.Write($currentID3Bytes,0,$currentID3Bytes.length)
                 $strm.Flush()
                 $Strm.Close()
-                $strm = New-Object System.IO.FileStream ($path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::Write,[System.IO.FileShare]::None)
+                $strm = New-Object System.IO.FileStream ($id3path,[System.IO.FileMode]::Open,[System.IO.FileAccess]::Write,[System.IO.FileShare]::None)
                 $strm.Seek(-128,'End') 
             } 
            $strm.Seek(3,'Current')  #skip over 'TAG' to get to the good stuff
@@ -181,9 +218,19 @@ $ru.year
                 $strm.Close()
             }
         }
-   
-  
-  }
+#################################################################################
 
+  Start-Sleep 5 # to don't get call limits from the API
 
-  #>
+##########################variables clear#######################################
+Remove-Variable * -Exclude $path -ErrorAction SilentlyContinue
+# redeclaring some variables that are neaded at the start
+# I have to clear every variable first because it can mess up the api and metadata update part
+$path = "path"
+$staticpath = "path"
+$basedURL = 'https://api.discogs.com/database/' 
+$p2=gci -Path $path -Filter *.mp3
+$vanillasong = gci -Path $path -Filter *.mp3 | select FullName
+$song1 = $p2.BaseName
+#################################################################################
+}
