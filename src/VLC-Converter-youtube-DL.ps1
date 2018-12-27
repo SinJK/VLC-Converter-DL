@@ -30,18 +30,15 @@ Import-Module $PSScriptRoot\DiscogAPI.psm1
    $i = $count.Count
 $menu = Read-Host -Prompt "
 What do you want to do ?
-
 1 - Download playlist as mp3
-
 2 - Get metadata from downloaded song
-
 "
 switch($menu){
 
 
 1{ Read-Host ("Enter the path destination of downloaded songs") | Set-Variable path,pathHash
 Read-Host ("Enter URL from youtube playlist or song`n Plase enter the entire URL") | Set-Variable yturl
-ytb-dl-converter
+ytb-dl-converter -path $path -yturl $yturl
 }
 2{
 $path = Read-Host "enter path"
@@ -55,7 +52,7 @@ $path = Read-Host "enter path"
 
 
 function ytb-dl-converter($path,$yturl){
-& path-to-youtube-dl\youtube-dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
+& pathtoyoutube-dl\youtube-dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
 
 Start-Sleep 3
 
@@ -187,6 +184,3 @@ Get-Job | Remove-Job
    }
 }
    start-sleep 2
-
-
-
