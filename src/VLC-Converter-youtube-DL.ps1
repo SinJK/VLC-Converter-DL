@@ -1,4 +1,5 @@
 Import-Module $PSScriptRoot\DiscogAPI.psm1
+
 <#
 .SYNOPSIS
   This script simply download youtube with youtube-dl song or playlist and convert it into .mp3 with VLC converter.
@@ -27,10 +28,33 @@ Import-Module $PSScriptRoot\DiscogAPI.psm1
    $pathHash = ""
    $count = get-childitem $path -recurse -include *.mp4, *.webm, *.mkv | Measure-Object
    $i = $count.Count
+$menu = Read-Host -Prompt "
+What do you want to do ?
 
- Read-Host ("Enter the path destination of downloaded songs") | Set-Variable path,pathHash
- Read-Host ("Enter URL from youtube playlist or song`n Plase enter the entire URL") | Set-Variable yturl
+1 - Download playlist as mp3
 
+2 - Get metadata from downloaded song
+
+"
+switch($menu){
+
+
+1{ Read-Host ("Enter the path destination of downloaded songs") | Set-Variable path,pathHash
+Read-Host ("Enter URL from youtube playlist or song`n Plase enter the entire URL") | Set-Variable yturl
+ytb-dl-converter
+}
+2{
+$path = Read-Host "enter path"
+ DiscogsAPI -path $path
+ }
+
+
+
+}
+
+
+
+function ytb-dl-converter($path,$yturl){
 & path-to-youtube-dl\youtube-dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
 
 Start-Sleep 3
@@ -161,7 +185,7 @@ Get-Job | Remove-Job
      }
 
    }
-
+}
    start-sleep 2
 
 
