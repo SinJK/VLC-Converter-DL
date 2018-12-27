@@ -1,3 +1,4 @@
+Import-Module $PSScriptRoot\DiscogAPI.psm1
 <#
 .SYNOPSIS
   This script simply download youtube with youtube-dl song or playlist and convert it into .mp3 with VLC converter.
