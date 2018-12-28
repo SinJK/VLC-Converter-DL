@@ -1,3 +1,4 @@
+﻿test
 function DiscogsAPI($path) {
     <#
 .SYNOPSIS
