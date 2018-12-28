@@ -1,5 +1,4 @@
-﻿test
-function DiscogsAPI($path) {
+﻿function DiscogsAPI($path) {
     <#
 .SYNOPSIS
   This script try to get .mp3 metadatas from Discogs.
