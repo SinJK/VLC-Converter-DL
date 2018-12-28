@@ -1,22 +1,9 @@
 # VLC-Converter-youtube-DL
 
-This script download youtube using [youtube-dl](https://github.com/rg3/youtube-dl) song or playlist and convert it into .mp3 with **VLC** converter.
-## Last update:
-**27/12/2018** : 
-- Made a menu to make different actions 
-- Added a function to get metadatas of songs that are in a folder.
-It is the second choice of the menu. You need to input the path of the folder you
-want like **"C:\file\filethatyouwanttoscan\"**
+This script download youtube video song or playlist, using [youtube-dl](https://github.com/rg3/youtube-dl), and convert it into .mp3 with **VLC** converter.
 
-- This new metadata module also offer a clean renamer for songs as **artist - songname**
-(Giving the randomness of certains songs on youtube, this can mess up sometimes)
 
-**_important_**
-if you want to enable this feature, get an API key on:
-https://www.discogs.com/developers/#page:authentication
 
-and add the key at the end of $uri on the metadata.psm1
-"token=yourKEY"
 
 **The process is simple**:
 1. Enter the path to destination folder.
@@ -43,3 +30,20 @@ my next goals are:
 6. ~~Add navigation Menu~~
 7. Add FLAC extension
 8. ~~Get metadata of songs~~
+
+## Changelog:
+**27/12/2018** : 
+- Made a menu to make different actions 
+- Added a function to get metadatas of songs that are in a folder.
+It is the second choice of the menu. You need to input the path of the folder you
+want like **"C:\file\filethatyouwanttoscan\"**
+
+- This new metadata module also offer a clean renamer for songs as **artist - songname**
+(Giving the randomness of certains songs on youtube, this can mess up sometimes)
+
+**_important_**
+if you want to enable this feature, get an API key on:
+https://www.discogs.com/developers/#page:authentication
+
+and add the key at the end of $uri on the metadata.psm1
+"token=yourKEY"
