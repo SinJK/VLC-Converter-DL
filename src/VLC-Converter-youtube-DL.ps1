@@ -20,6 +20,7 @@ Import-Module $PSScriptRoot\DiscogAPI.psm1
 .EXAMPLE
   None
 #>
+#############################Settings############################################
  $outputExtension = ".mp3"
    $bitrate = 128
    $channels = 2
@@ -28,6 +29,9 @@ Import-Module $PSScriptRoot\DiscogAPI.psm1
    $pathHash = ""
    $count = get-childitem $path -recurse -include *.mp4, *.webm, *.mkv | Measure-Object
    $i = $count.Count
+#################################################################################
+
+#################################MENU############################################
 $menu = Read-Host -Prompt "
 What do you want to do ?
 1 - Download playlist as mp3
@@ -49,13 +53,17 @@ $path = Read-Host "enter path"
 
 }
 
+#################################################################################
 
+#############################Function############################################
 
 function ytb-dl-converter($path,$yturl){
+##############################Download part######################################
 & pathtoyoutube-dl\youtube-dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
 
 Start-Sleep 3
-
+#################################################################################
+#######################Duplicate tracker by Hash part############################
 $b = gci $pathHash\* -file -recurse | Group-Object Length | Where-Object { $_.Count -gt 1 } | select -ExpandProperty group | foreach {get-filehash -literalpath $_.fullname} | group -property hash | where { $_.count -gt 1 } | foreach { $_.group | select -skip 1 }
 
 Write-Host "Looking for duplicates by HASH" -ForegroundColor Yellow
@@ -105,7 +113,9 @@ Else {
 }
 }
 
+#################################################################################
 
+#############################Duplicate by name part##############################
    foreach($inputFile in get-childitem $path -recurse -include *.mp4,*.mkv, *.webm)
    { 
      $inputFile2 = $inputFile.FullName.Replace("[","").Replace("]","")
@@ -140,6 +150,8 @@ Get-Job | Remove-Job
      }
      
      }
+#################################################################################
+###############################Converter Part####################################
      else{
      
      $outputFileName = $outputFileName.Replace("[","").Replace("]","").Replace(' ','%20').Replace("'","-")
@@ -180,7 +192,7 @@ Get-Job | Remove-Job
      $i--
      }
      }
-
+#################################################################################
    }
 }
    start-sleep 2
