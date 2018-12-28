@@ -1,6 +1,6 @@
 # VLC-Converter-youtube-DL
 
-This script download youtube video song or playlist, using [youtube-dl](https://github.com/rg3/youtube-dl), and convert it into .mp3 with **VLC** converter.
+This script download song or playlist, using [youtube-dl](https://github.com/rg3/youtube-dl), and convert it into .mp3 with **VLC** converter.
 
 ## Requirements
 You will need [youtube-dl](https://github.com/rg3/youtube-dl) and VLC to get it work.
