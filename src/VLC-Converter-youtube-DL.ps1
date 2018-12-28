@@ -2,7 +2,7 @@ Import-Module $PSScriptRoot\DiscogAPI.psm1
 
 <#
 .SYNOPSIS
-  This script download youtube video song or playlist, using youtube-dl, and convert it into .mp3 with VLC converter.
+  This script download song or playlist, using video download software, and convert it into .mp3 with VLC converter.
 .DESCRIPTION
   
 .PARAMETER <Parameter_Name>
@@ -42,7 +42,7 @@ switch ($menu) {
 
     1 {
         Read-Host ("Enter the path destination of downloaded songs") | Set-Variable path, pathHash
-        Read-Host ("Enter URL from youtube playlist or song`n Plase enter the entire URL") | Set-Variable yturl
+        Read-Host ("Enter URL from playlist or song`n Plase enter the entire URL") | Set-Variable yturl
         ytb-dl-converter -path $path -yturl $yturl
     }
     2 {
@@ -60,7 +60,7 @@ switch ($menu) {
 
 function ytb-dl-converter($path, $yturl) {
     ##############################Download part######################################
-    & pathtoyoutube-dl\youtube-dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
+    & path-dl\dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
 
     Start-Sleep 3
     #################################################################################
