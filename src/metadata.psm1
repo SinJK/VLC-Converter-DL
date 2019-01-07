@@ -19,7 +19,7 @@ function DiscogsAPI($path) {
 .EXAMPLE
   None
 #>
-    #############################Settings############################################
+    #region Settings
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $path = "path"
     $staticpath = "path"
@@ -27,10 +27,10 @@ function DiscogsAPI($path) {
     $p2 = gci -Path $path -Filter *.mp3
     $vanillasong = gci -Path $path -Filter *.mp3 | select FullName
     $song1 = $p2.BaseName
-    #################################################################################
+    #endregion Settings
     ###########################Loop through each song################################
 
-    ###########################First loop to clean up songs name#####################
+    #region First loop to clean up songs name
     foreach ($song in $song1) {
         $stat = $song
         if ($song -match "()") {
@@ -104,9 +104,9 @@ function DiscogsAPI($path) {
         $artist = $song.Split("-")[0]
         Write-Host $artist - $title -ForegroundColor Cyan
         $title = $title.Trim()
-        #################################################################################
+        #endregion First loop to clean up songs name
 
-        ################################API SETTINGS#####################################
+        #region API SETTINGS
         $headers = "ytconverterdl/1.0 +https://github.com/SinJK/VLC-Converter-youtube-DL" 
                                            
         $uri = $basedURL + "search?q=$title - $artist&per_page=5&type=all&token=*******"
@@ -114,8 +114,8 @@ function DiscogsAPI($path) {
         Write-host [$uri]
 
         write-host "avant"  
-
-        ###############################API CALL##########################################
+        #endregion API SETTINGS
+        #region API CALL
         $y = Invoke-RestMethod -Uri $uri -UserAgent $headers -method Get
 
         write-host "apres"
@@ -124,9 +124,9 @@ function DiscogsAPI($path) {
         $w = $results -match $artist.Trim()
 
         $album = $results | Where-Object {$_.format -match "Album"} | select -First 5
-        #################################################################################
+        #endregion API CALL
 
-        ########################Loop to get song's infos#################################
+        #region Loop to get song's infos
         #$ivalbum=$album.master_url
         foreach ($release in $album) {
             #if($release){
@@ -150,21 +150,21 @@ function DiscogsAPI($path) {
                 $artist
                 break
             }
-            #################################################################################
+            #endregion Loop to get song's infos
 
             Start-Sleep 3
             #}
         }
 
-        ##############################In case the title is not found#####################
+        #region In case the title is not found
         #get the Name cleaned at the beginning
         if ($track -eq $null) {$track = $title}
         $newSongName = "$artist - $title"
         Rename-Item -LiteralPath "$staticpath$stat.mp3" -NewName "$newSongName.mp3"
-        #################################################################################
+        #endregion In case the title is not found
 
 
-        ############################Metadata add to the song file########################
+        #region Metadata add to the song file
         [string]$id3path = "$staticpath$newSongName.mp3"
         #\$stat.mp3
         [string]$Title = $track
@@ -221,11 +221,11 @@ function DiscogsAPI($path) {
                 $strm.Close()
             }
         }
-        #################################################################################
+        #endregion Metadata add to the song file
 
         Start-Sleep 5 # to don't get call limits from the API
 
-        ##########################variables clear#######################################
+        #region variables clear
         Remove-Variable * -Exclude $path -ErrorAction SilentlyContinue
         # redeclaring some variables that are neaded at the start
         # I have to clear every variable first because it can mess up the api and metadata update part
@@ -235,7 +235,7 @@ function DiscogsAPI($path) {
         $p2 = gci -Path $path -Filter *.mp3
         $vanillasong = gci -Path $path -Filter *.mp3 | select FullName
         $song1 = $p2.BaseName
-        #################################################################################
+        #endregion variables clear
     }
 
 }
