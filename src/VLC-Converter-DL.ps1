@@ -20,7 +20,7 @@ Import-Module $PSScriptRoot\DiscogAPI.psm1
 .EXAMPLE
   None
 #>
-#############################Settings############################################
+#region Settings
 $outputExtension = ".mp3"
 $bitrate = 128
 $channels = 2
@@ -29,9 +29,9 @@ $path = ""
 $pathHash = ""
 $count = get-childitem $path -recurse -include *.mp4, *.webm, *.mkv | Measure-Object
 $i = $count.Count
-#################################################################################
+#endregion Settings
 
-#################################MENU############################################
+#region MENU
 $menu = Read-Host -Prompt "
 What do you want to do ?
 1 - Download playlist as mp3
@@ -54,17 +54,17 @@ switch ($menu) {
 
 }
 
-#################################################################################
+#endregion MENU
 
 #############################Function############################################
 
 function ytb-dl-converter($path, $yturl) {
-    ##############################Download part######################################
+    #region Download part
     & path-dl\dl.exe -o "$path/%(title)s.%(ext)s" "$yturl" 
 
     Start-Sleep 3
-    #################################################################################
-    #######################Duplicate tracker by Hash part############################
+    #endregion Download part
+    #region Duplicate tracker by Hash part
     $b = gci $pathHash\* -file -recurse | Group-Object Length | Where-Object { $_.Count -gt 1 } | select -ExpandProperty group | foreach {get-filehash -literalpath $_.fullname} | group -property hash | where { $_.count -gt 1 } | foreach { $_.group | select -skip 1 }
 
     Write-Host "Looking for duplicates by HASH" -ForegroundColor Yellow
@@ -113,9 +113,9 @@ function ytb-dl-converter($path, $yturl) {
         }
     }
 
-    #################################################################################
+    #endregion Duplicate tracker by Hash part
 
-    #############################Duplicate by name part##############################
+    #region Duplicate by name part
     foreach ($inputFile in get-childitem $path -recurse -include *.mp4, *.mkv, *.webm) { 
         $inputFile2 = $inputFile.FullName.Replace("[", "").Replace("]", "")
         $outputFileName = [System.IO.Path]::GetFileNameWithoutExtension($inputFile.FullName) + $outputExtension;
@@ -149,8 +149,8 @@ function ytb-dl-converter($path, $yturl) {
             }
      
         }
-        #################################################################################
-        ###############################Converter Part####################################
+        #endregion Duplicate by name part
+        #region Converter Part
         else {
      
             $outputFileName = $outputFileName.Replace("[", "").Replace("]", "").Replace(' ', '%20').Replace("'", "-")
@@ -191,7 +191,7 @@ function ytb-dl-converter($path, $yturl) {
                 $i--
             }
         }
-        #################################################################################
+        #endregion Converter Part
     }
 }
 start-sleep 2
